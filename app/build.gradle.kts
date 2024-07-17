@@ -61,14 +61,28 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    //RETROFIT
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+
+    //GSON
     implementation(libs.gson)
+
+    //DAGGER
     implementation(libs.daggerHilt)
+    implementation(libs.androidx.runtime.livedata)
     kapt(libs.daggerHiltCompiler)
+
+    //VIEWMODEL COMPOSE
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
+
     // Okhttp
     implementation(libs.okhttp3)
     implementation(libs.okhttp3.logging.interceptor)
+
+    //TEST
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -78,6 +92,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
 }
+
 kapt{
     correctErrorTypes=true
 }

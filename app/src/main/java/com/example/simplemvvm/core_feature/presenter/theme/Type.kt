@@ -1,4 +1,4 @@
-package com.example.simplemvvm.ui.theme
+package com.example.simplemvvm.core_feature.presenter.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

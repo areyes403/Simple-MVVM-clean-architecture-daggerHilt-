@@ -1,4 +1,4 @@
-package com.example.simplemvvm.ui.theme
+package com.example.simplemvvm.core_feature.presenter.theme
 
 import android.app.Activity
 import android.os.Build
