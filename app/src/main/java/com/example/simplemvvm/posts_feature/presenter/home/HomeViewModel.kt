@@ -12,16 +12,20 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getAllPostsUseCase: GetAllPosts
 ) : ViewModel() {
+
     private val _posts=MutableLiveData<UIState<List<Posts>>>()
     val posts:LiveData<UIState<List<Posts>>>
         get() = _posts
+
     init {
         getAllPosts()
     }
+
     private fun getAllPosts() = viewModelScope.launch(Dispatchers.IO){
         _posts.postValue(getAllPostsUseCase().toUIState())
     }

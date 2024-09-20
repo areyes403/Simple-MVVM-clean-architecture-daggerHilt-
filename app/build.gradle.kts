@@ -72,6 +72,8 @@ dependencies {
     //DAGGER
     implementation(libs.daggerHilt)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.datastore.preferences)
     kapt(libs.daggerHiltCompiler)
 
     //VIEWMODEL COMPOSE
