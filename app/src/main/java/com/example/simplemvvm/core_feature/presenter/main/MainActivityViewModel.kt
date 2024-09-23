@@ -7,7 +7,10 @@ import com.example.simplemvvm.auth_feature.domain.usecase.ObserveMySession
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,10 +20,14 @@ class MainActivityViewModel @Inject constructor(
 ):ViewModel() {
     private val _mySession= MutableStateFlow<CurrentSession?>(null)
     val mySession:StateFlow<CurrentSession?> get() = _mySession
+        .onStart {
+            startObservingSession()
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000L),
+            null
+        )
 
-    init {
-        startObservingSession()
-    }
 
     private fun startObservingSession()=viewModelScope.launch(Dispatchers.IO){
         observeMySessionUseCase().collect{

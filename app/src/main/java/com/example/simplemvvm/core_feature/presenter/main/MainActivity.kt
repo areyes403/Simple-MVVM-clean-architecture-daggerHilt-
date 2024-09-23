@@ -5,12 +5,14 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -45,14 +47,15 @@ fun NavigationGraph(
 ){
     val navHostController = rememberNavController()
     val mySessionState by viewModel.mySession.collectAsState()
+    val snackBarHostState = remember { SnackbarHostState() }
+
 
     if (mySessionState==null){
-        println("please SIGN IN")
         val graph = navHostController.createGraph(startDestination = Screen.Login.route){
             composable(
                 route = Screen.Login.route,
                 content = {
-                    LoginScreen()
+                    LoginScreen(snackBarHost = snackBarHostState)
                 }
             )
             composable(
