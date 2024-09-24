@@ -16,44 +16,44 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.simplemvvm.core_feature.domain.model.APIResponse
 import com.example.simplemvvm.core_feature.domain.model.UIState
-import kotlinx.coroutines.launch
-import kotlin.math.log
+
 
 @Composable
 fun LoginScreen(
-    snackBarHost:SnackbarHostState,
-    viewModel:LoginScreenViewModel = hiltViewModel()
+    viewModel:LoginScreenViewModel = hiltViewModel(),
+    navigateToRegistration:()->Unit
 ){
     val userEmail = remember { mutableStateOf("") }
     val userPassword = remember { mutableStateOf("") }
-    val loginState by remember { derivedStateOf { viewModel.loginResponse } }
-    val scope = rememberCoroutineScope()
+    var loading by remember { mutableStateOf(false) }
+    val response by viewModel.loginResponse.observeAsState()
 
     Scaffold(
         snackbarHost = {
-            SnackbarHost(hostState = snackBarHost)
+            //SnackbarHost(hostState = snackBarHost)
         }
     ) { content->
         Column(
-            modifier = Modifier.padding(content)
+            modifier = Modifier
+                .padding(content)
+                .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 0.dp)
         ){
             // Welcome message
             Text(text = "Hello,\nWelcome to the login page", fontSize = 25.sp,
@@ -74,7 +74,7 @@ fun LoginScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(0.dp, 20.dp, 0.dp, 0.dp)
+                    .padding(0.dp, 8.dp, 0.dp, 0.dp)
             )
 
             // Password input field
@@ -89,36 +89,51 @@ fun LoginScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(0.dp, 20.dp, 0.dp, 0.dp),
+                    .padding(0.dp, 8.dp, 0.dp, 0.dp),
                 visualTransformation = PasswordVisualTransformation()
             )
 
             // Login button
-            OutlinedButton(onClick = {
-                viewModel.login(email = userEmail.value, password = userPassword.value)
-            },
+            OutlinedButton(
+                onClick = {
+                    loading=true
+                    viewModel.login(email = userEmail.value, password = userPassword.value)
+                          },
+                enabled = !loading,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(0.dp, 25.dp, 0.dp, 0.dp)) {
-                Text(text = "Login",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(5.dp),
-                    textAlign = TextAlign.Center,
-                    fontSize = 20.sp
-                )
-            }
-        }
-        when(loginState){
-            is UIState.Loading->{
-                Log.i("loginState","Loading")
+                    .padding(0.dp, 25.dp, 0.dp, 0.dp)
+            ) {
+                if (loading){
+                    CircularProgressIndicator(
+                        modifier = Modifier.width(64.dp),
+                        color = MaterialTheme.colorScheme.secondary,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    )
+                }else{
+                    Text(text = "Login",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp),
+                        textAlign = TextAlign.Center,
+                        fontSize = 20.sp
+                    )
+                }
 
             }
-            is UIState.Success->{
+        }
+        when(response){
+            is APIResponse.Success->{
                 Log.i("loginState","Success")
+                loading=false
             }
-            is UIState.Error->{
-                Log.e("loginState", (loginState as UIState.Error).message)
+            is APIResponse.Error->{
+                loading=false
+                Log.i("loginState","Error")
+            }
+            else->{
+                Log.i("loginState","null")
+
             }
         }
     }

@@ -1,27 +1,27 @@
 package com.example.simplemvvm.core_feature.presenter.main
 
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import dagger.hilt.android.AndroidEntryPoint
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.createGraph
-import com.example.simplemvvm.auth_feature.presenter.login.LoginScreen
-import com.example.simplemvvm.auth_feature.presenter.register.RegisterScreen
-import com.example.simplemvvm.core_feature.presenter.navigation.Screen
+import com.example.simplemvvm.core_feature.presenter.navigation.MainScreen
+import com.example.simplemvvm.core_feature.presenter.navigation.NavigationRoutes
+import com.example.simplemvvm.core_feature.presenter.navigation.authGraph
 import com.example.simplemvvm.core_feature.presenter.theme.AppTheme
 
 @AndroidEntryPoint
@@ -32,6 +32,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppTheme{
                 Surface(
+                    modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ){
                     NavigationGraph()
@@ -43,33 +44,28 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun NavigationGraph(
-    viewModel:MainActivityViewModel= hiltViewModel()
+    modifier:Modifier=Modifier,
+    viewModel:MainActivityViewModel= hiltViewModel(),
+    navHostController:NavHostController = rememberNavController()
 ){
-    val navHostController = rememberNavController()
     val mySessionState by viewModel.mySession.collectAsState()
-    val snackBarHostState = remember { SnackbarHostState() }
-
 
     if (mySessionState==null){
-        val graph = navHostController.createGraph(startDestination = Screen.Login.route){
-            composable(
-                route = Screen.Login.route,
-                content = {
-                    LoginScreen(snackBarHost = snackBarHostState)
-                }
-            )
-            composable(
-                route = Screen.Register.route,
-                content = {
-                    RegisterScreen()
-                }
-            )
+        NavHost(
+            modifier = modifier,
+            navController = navHostController,
+            startDestination = NavigationRoutes.Unauthenticated.NavigationRoute.route
+        ){
+            authGraph(navController = navHostController)
         }
-        NavHost(navController = navHostController, graph = graph)
     }else{
-        println("please SIGN OUT")
+        MainScreen(navController = navHostController, modifier = modifier)
     }
 }
+
+
+
+
 
 
 
